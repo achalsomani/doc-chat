@@ -15,7 +15,7 @@ export default function App() {
           <FiUpload size={32} />
           <span className="mt-2">Ingest</span>
         </button>
-        {/* <button
+        <button
           className="w-40 h-40 bg-green-600 text-white text-lg font-semibold rounded-full shadow-lg hover:bg-green-700 transition flex flex-col items-center justify-center"
           onClick={() => navigate('/chat/new')}
         >
@@ -28,7 +28,7 @@ export default function App() {
         >
           <FiClock size={32} />
           <span className="mt-2">History</span>
-        </button> */}
+        </button>
       </div>
     </div>
   );

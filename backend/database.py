@@ -32,3 +32,34 @@ def insert_chunk(filename: str, chunk_text: str, embedding: list[float]) -> None
         datetime.utcnow()
     ))
     conn.commit()
+
+def insert_new_chat(chat_id: str) -> None:
+    sql = """
+        INSERT INTO MESSAGES (id, chat_id, created_at)
+        VALUES (%s, %s, %s)
+    """
+    cursor.execute(sql, (chat_id, chat_id, datetime.utcnow()))
+    conn.commit()
+
+def update_chat(chat_id: str, content: dict) -> None:
+    sql = """
+        UPDATE MESSAGES 
+        SET content = %s, created_at = %s 
+        WHERE id = %s
+    """
+    cursor.execute(sql, (json.dumps(content), datetime.utcnow(), chat_id))
+    conn.commit()
+
+def fetch_content(chat_id: str) -> list[dict]:
+    sql = "SELECT content FROM MESSAGES WHERE id = %s"
+    cursor.execute(sql, (chat_id,))
+    row = cursor.fetchone()
+    if row and row[0]:
+        return json.loads(row[0])
+    return []
+
+def fetch_all_chunks() -> list[dict]:
+    sql = "SELECT id, chunk_text, embedding FROM CHUNKS"
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+    return [{"id": row[0], "chunk": row[1], "embedding": json.loads(row[2])} for row in rows]

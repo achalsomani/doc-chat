@@ -4,7 +4,7 @@ import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, File, UploadFile
 from chunking import split_text_into_chunks
-from database import insert_chunk, fetch_all_chunks,update_chat, fetch_content, insert_new_chat
+from database import insert_chunk, fetch_all_chunks,update_chat, fetch_content, insert_new_chat,fetch_all_chats
 from embedd import generate_embedding
 from top_k import retrieve_top_chunks
 import os
@@ -67,6 +67,17 @@ async def handle_message(request: MessageRequest):
         "response": answer,
         "used_chunks": used_chunk_ids
     }
+
+@app.get("/history")
+async def get_full_history():
+    chats = fetch_all_chats()
+    return {"chats": chats}
+
+@app.get("/chat/{chat_id}")
+async def get_chat(chat_id: str):
+    content = fetch_content(chat_id)
+    print(f"Content for chat {chat_id}: {content}")
+    return {"chat_id": chat_id, "messages": content}
 
 @app.post("/ingest")
 async def ingest_file(file: UploadFile = File(...)):

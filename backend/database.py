@@ -63,3 +63,17 @@ def fetch_all_chunks() -> list[dict]:
     cursor.execute(sql)
     rows = cursor.fetchall()
     return [{"id": row[0], "chunk": row[1], "embedding": json.loads(row[2])} for row in rows]
+
+
+def fetch_all_chats() -> list[dict]:
+    sql = "SELECT id, content FROM MESSAGES ORDER BY created_at DESC"
+    cursor.execute(sql)
+    rows = cursor.fetchall()
+
+    chats = []
+    for row in rows:
+        chat_id, content_json = row
+        content = json.loads(content_json) if content_json else []
+        chats.append({"chat_id": chat_id, "content": content})
+
+    return chats

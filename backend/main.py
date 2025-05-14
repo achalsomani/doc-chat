@@ -25,7 +25,7 @@ app.add_middleware(
 )
 
 @app.post("/chat/new")
-async def create_chat():
+async def create_chat() -> dict:
     try:
         chat_id = str(uuid.uuid4())
         insert_new_chat(chat_id)
@@ -40,7 +40,7 @@ class MessageRequest(BaseModel):
     input: str
 
 @app.post("/message")
-async def handle_message(request: MessageRequest):
+async def handle_message(request: MessageRequest) -> dict:
     try:
         content = fetch_content(request.chat_id)
         query_embedding = generate_embedding(request.input)
@@ -76,7 +76,7 @@ async def handle_message(request: MessageRequest):
         raise HTTPException(status_code=500, detail="Failed to process message.")
 
 @app.get("/history")
-async def get_full_history():
+async def get_full_history() -> dict:
     try:
         chats = fetch_all_chats()
         return {"chats": chats}
@@ -85,7 +85,7 @@ async def get_full_history():
         raise HTTPException(status_code=500, detail="Failed to fetch history.")
 
 @app.get("/chat/{chat_id}")
-async def get_chat(chat_id: str):
+async def get_chat(chat_id: str) -> dict:
     try:
         content = fetch_content(chat_id)
         print(f"Content for chat {chat_id}: {content}")
@@ -95,7 +95,7 @@ async def get_chat(chat_id: str):
         raise HTTPException(status_code=500, detail="Failed to fetch chat.")
 
 @app.post("/ingest")
-async def ingest_file(file: UploadFile = File(...)):
+async def ingest_file(file: UploadFile = File(...)) -> dict:
     try:
         content = (await file.read()).decode('utf-8', errors='ignore')
         chunks = split_text_into_chunks(content, max_tokens=300, overlap_tokens=50)

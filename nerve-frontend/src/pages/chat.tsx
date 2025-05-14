@@ -13,6 +13,7 @@ export default function ChatPage() {
   const { chatId, setChatId, messages, setMessages } = useChat();
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [sending, setSending] = useState<boolean>(false);
   const { chatId: urlChatId } = useParams();
   const [error, setError] = useState<string | null>(null);
 
@@ -41,6 +42,7 @@ export default function ChatPage() {
   const sendMessage = async () => {
     if (!input.trim()) return;
     setError(null);
+    setSending(true);
 
     let currentChatId = chatId;
     if (!currentChatId || urlChatId === 'new') {
@@ -71,6 +73,8 @@ export default function ChatPage() {
       setError('Failed to send message. Please try again.');
       setMessages((prev) => prev.slice(0, -1));
       console.error('Message Send Failed:', err);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -97,15 +101,19 @@ export default function ChatPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask your question..."
+              disabled={sending}
             />
             <button
               className="ml-2 p-3 bg-blue-600 text-white rounded-lg"
               onClick={sendMessage}
-              disabled={!input.trim()}
+              disabled={!input.trim() || sending}
             >
-              Send
+              {sending ? 'Sending...' : 'Send'}
             </button>
           </div>
+          {sending && (
+            <div className="text-gray-600 mt-2 w-full max-w-lg text-center">Waiting for response...</div>
+          )}
           {error && (
             <div style={{color: 'red'}} className="mt-2 w-full max-w-lg">{error}</div>
           )}

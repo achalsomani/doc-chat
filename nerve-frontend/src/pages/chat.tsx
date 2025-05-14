@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
-import api from '../api';
-import { useChat } from '../context/contextProvider';
-import { useParams } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import api from "../api";
+import { useChat } from "../context/contextProvider";
+import { useParams } from "react-router-dom";
 
 type Message = {
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   used_chunks?: string[];
 };
 
 export default function ChatPage() {
   const { chatId, setChatId, messages, setMessages } = useChat();
-  const [input, setInput] = useState<string>('');
+  const [input, setInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
   const { chatId: urlChatId } = useParams();
@@ -19,18 +19,21 @@ export default function ChatPage() {
 
   useEffect(() => {
     const loadChat = async () => {
-      if (urlChatId && urlChatId !== 'new') {
+      if (urlChatId && urlChatId !== "new") {
         setLoading(true);
         setChatId(urlChatId);
         try {
           const res = await api.get(`/chat/${urlChatId}`);
-          const mappedMessages = res.data.messages.flatMap((msg: { user: string, agent: string }) => [
-            msg.user ? { role: 'user', content: msg.user } : null,
-            msg.agent ? { role: 'assistant', content: msg.agent } : null,
-          ].filter(Boolean));
-          setMessages(mappedMessages); 
+          const mappedMessages = res.data.messages.flatMap(
+            (msg: { user: string; agent: string }) =>
+              [
+                msg.user ? { role: "user", content: msg.user } : null,
+                msg.agent ? { role: "assistant", content: msg.agent } : null,
+              ].filter(Boolean),
+          );
+          setMessages(mappedMessages);
         } catch (err) {
-          console.error('Failed to load chat:', err);
+          console.error("Failed to load chat:", err);
         } finally {
           setLoading(false);
         }
@@ -45,34 +48,34 @@ export default function ChatPage() {
     setSending(true);
 
     let currentChatId = chatId;
-    if (!currentChatId || urlChatId === 'new') {
-      const res = await api.post('/chat/new');
+    if (!currentChatId || urlChatId === "new") {
+      const res = await api.post("/chat/new");
       currentChatId = res.data.chat_id;
       setChatId(currentChatId);
-      window.history.pushState({}, '', `/chat/${currentChatId}`);
+      window.history.pushState({}, "", `/chat/${currentChatId}`);
     }
 
-    const userMessage: Message = { role: 'user', content: input };
+    const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
 
     try {
-      const res = await api.post('/message', {
+      const res = await api.post("/message", {
         chat_id: currentChatId,
         input,
       });
 
       const assistantMessage: Message = {
-        role: 'assistant',
+        role: "assistant",
         content: res.data.response,
         used_chunks: res.data.used_chunks,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
-      setError('Failed to send message. Please try again.');
+      setError("Failed to send message. Please try again.");
       setMessages((prev) => prev.slice(0, -1));
-      console.error('Message Send Failed:', err);
+      console.error("Message Send Failed:", err);
     } finally {
       setSending(false);
     }
@@ -87,10 +90,14 @@ export default function ChatPage() {
           <div className="w-full max-w-lg space-y-2 flex-1 overflow-y-auto mb-4">
             {messages.map((msg, idx) => (
               <div key={idx} className="p-3 rounded-lg max-w-xs self-start ">
-                {msg.role === 'user' ? (
-                  <div style={{color: 'blue'}}><strong>Question:</strong> {msg.content}</div>
+                {msg.role === "user" ? (
+                  <div style={{ color: "blue" }}>
+                    <strong>Question:</strong> {msg.content}
+                  </div>
                 ) : (
-                  <div><strong>Answer:</strong> {msg.content}</div>
+                  <div>
+                    <strong>Answer:</strong> {msg.content}
+                  </div>
                 )}
               </div>
             ))}
@@ -108,14 +115,18 @@ export default function ChatPage() {
               onClick={sendMessage}
               disabled={!input.trim() || sending}
             >
-              {sending ? 'Sending...' : 'Send'}
+              {sending ? "Sending..." : "Send"}
             </button>
           </div>
           {sending && (
-            <div className="text-gray-600 mt-2 w-full max-w-lg text-center">Waiting for response...</div>
+            <div className="text-gray-600 mt-2 w-full max-w-lg text-center">
+              Waiting for response...
+            </div>
           )}
           {error && (
-            <div style={{color: 'red'}} className="mt-2 w-full max-w-lg">{error}</div>
+            <div style={{ color: "red" }} className="mt-2 w-full max-w-lg">
+              {error}
+            </div>
           )}
         </>
       )}

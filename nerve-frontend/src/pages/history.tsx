@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import api from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import api from "../api";
+import { useNavigate } from "react-router-dom";
 
 type Chat = {
   chat_id: string;
@@ -14,18 +14,18 @@ export default function HistoryPage() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await api.get('/history');
+        const res = await api.get("/history");
         setChats(res.data.chats);
       } catch (err) {
-        console.error('Failed to fetch history:', err);
+        console.error("Failed to fetch history:", err);
       }
     };
     fetchHistory();
   }, []);
 
-  const getFirstQuestion = (content: Chat['content']) => {
+  const getFirstQuestion = (content: Chat["content"]) => {
     const first = content.find((msg) => msg.user);
-    return first ? first.user : 'No question yet';
+    return first ? first.user : "No question yet";
   };
 
   return (

@@ -6,7 +6,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
-      <h1 className="text-4xl font-bold mb-12">Take Home Assessment</h1>
+      <h1 className="text-4xl font-bold mb-12 text-center">Take Home Assessment</h1>
       <div className="flex gap-12">
         <button
           className="w-40 h-40 bg-blue-600 text-white text-lg font-semibold rounded-full shadow-lg hover:bg-blue-700 transition flex flex-col items-center justify-center"

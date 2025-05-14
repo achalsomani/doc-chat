@@ -14,6 +14,7 @@ export default function ChatPage() {
   const [input, setInput] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const { chatId: urlChatId } = useParams();
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const loadChat = async () => {
@@ -35,10 +36,11 @@ export default function ChatPage() {
       }
     };
     loadChat();
-  }, [urlChatId, setChatId, setMessages]);
+  }, [urlChatId]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
+    setError(null);
 
     let currentChatId = chatId;
     if (!currentChatId || urlChatId === 'new') {
@@ -66,6 +68,8 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (err) {
+      setError('Failed to send message. Please try again.');
+      setMessages((prev) => prev.slice(0, -1));
       console.error('Message Send Failed:', err);
     }
   };
@@ -78,9 +82,9 @@ export default function ChatPage() {
         <>
           <div className="w-full max-w-lg space-y-2 flex-1 overflow-y-auto mb-4">
             {messages.map((msg, idx) => (
-              <div key={idx} className="p-3 rounded-lg max-w-xs self-start bg-gray-100 text-black">
+              <div key={idx} className="p-3 rounded-lg max-w-xs self-start ">
                 {msg.role === 'user' ? (
-                  <div><strong>Question:</strong> {msg.content}</div>
+                  <div style={{color: 'blue'}}><strong>Question:</strong> {msg.content}</div>
                 ) : (
                   <div><strong>Answer:</strong> {msg.content}</div>
                 )}
@@ -97,10 +101,14 @@ export default function ChatPage() {
             <button
               className="ml-2 p-3 bg-blue-600 text-white rounded-lg"
               onClick={sendMessage}
+              disabled={!input.trim()}
             >
               Send
             </button>
           </div>
+          {error && (
+            <div style={{color: 'red'}} className="mt-2 w-full max-w-lg">{error}</div>
+          )}
         </>
       )}
     </div>

@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 export default function Ingest() {
   const [file, setFile] = useState<File | null>(null);
-
+  const navigate = useNavigate();
   const handleUpload = async () => {
     if (!file) return alert('Please select a file first.');
     const formData = new FormData();
@@ -14,6 +15,7 @@ export default function Ingest() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert(`File Ingested: ${response.data.success}`);
+      navigate('/');
     } catch (error) {
       console.error('Upload Error:', error);
       alert('Failed to upload file.');

@@ -73,6 +73,7 @@ CREATE OR REPLACE TABLE NERVE.PUBLIC.MESSAGES (
 ### 2. Install backend dependencies
 
 ```bash
+cd backend
 pip install -r requirements.txt
 ```
 
@@ -101,7 +102,7 @@ python main.py
 **Frontend:**
 
 ```bash
-cd nerve-frontend
+cd frontend
 npm install
 npm run dev
 ```

@@ -107,6 +107,9 @@ export default function ChatPage() {
               className="flex-1 p-3 border rounded-lg"
               value={input}
               onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') sendMessage();
+              }}
               placeholder="Ask your question..."
               disabled={sending}
             />
@@ -115,6 +118,7 @@ export default function ChatPage() {
               onClick={sendMessage}
               disabled={!input.trim() || sending}
             >
+              {sending ? "sent" : "Send"}
             </button>
           </div>
           {sending && (

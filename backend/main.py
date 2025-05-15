@@ -57,9 +57,7 @@ async def handle_message(request: MessageRequest) -> dict:
 
         stored_chunks = fetch_all_chunks()
         top_chunks = retrieve_top_chunks(query_embedding, stored_chunks, top_k=2)
-        print(f"Top chunks: {top_chunks}")
         context = "\n".join([item["chunk"] for item in top_chunks])
-        print(f"Context: {context}")
         used_chunk_ids = [item["id"] for item in top_chunks]
 
         prompt = f"Context:\n{context}\n\nQuestion: {request.input}\nAnswer the question based on the context above. Please dont include any information that is not in the context. If you don't know the answer, say 'I don't know'. and dont include extra information."
@@ -99,7 +97,6 @@ async def get_full_history() -> dict:
 async def get_chat(chat_id: str) -> dict:
     try:
         content = fetch_content(chat_id)
-        print(f"Content for chat {chat_id}: {content}")
         return {"chat_id": chat_id, "messages": content}
     except Exception as e:
         print(f"Get chat error: {e}")

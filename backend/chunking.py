@@ -1,20 +1,14 @@
-from transformers import AutoTokenizer
+import tiktoken
 
-tokenizer = AutoTokenizer.from_pretrained(
-    "bert-base-uncased"
-)  # You can change the model if needed
+tokenizer = tiktoken.encoding_for_model("text-embedding-3-small")
 
-
-def split_text_into_chunks(
-    text: str, max_tokens: int = 200, overlap_tokens: int = 50
-) -> list[str]:
+def split_text_into_chunks(text: str, max_tokens: int = 200, overlap_tokens: int = 50) -> list[str]:
     sentences = text.split(". ")
-    chunks = []
-    current_chunk = []
-    current_tokens = 0
+    chunks, current_chunk, current_tokens = [], [], 0
 
-    for sentence in sentences:
-        token_count = len(tokenizer.encode(sentence, add_special_tokens=False))
+    for idx, sentence in enumerate(sentences):
+        tokens = tokenizer.encode(sentence)
+        token_count = len(tokens)
 
         if current_tokens + token_count <= max_tokens:
             current_chunk.append(sentence)
@@ -22,13 +16,9 @@ def split_text_into_chunks(
         else:
             chunks.append(". ".join(current_chunk) + ".")
             if overlap_tokens > 0:
-                overlap_content = tokenizer.encode(
-                    ". ".join(current_chunk), add_special_tokens=False
-                )[-overlap_tokens:]
-                current_chunk = [tokenizer.decode(overlap_content), sentence]
-                current_tokens = len(
-                    tokenizer.encode(" ".join(current_chunk), add_special_tokens=False)
-                )
+                overlap_sentences = sentences[max(0, idx - 1):idx]
+                current_chunk = overlap_sentences + [sentence]
+                current_tokens = sum(len(tokenizer.encode(s)) for s in current_chunk)
             else:
                 current_chunk = [sentence]
                 current_tokens = token_count

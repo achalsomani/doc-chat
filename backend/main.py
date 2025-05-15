@@ -11,7 +11,7 @@ from database import (
     insert_new_chat,
     fetch_all_chats,
 )
-from embedd import generate_embedding
+from embed import generate_embedding
 from top_k import retrieve_top_chunks
 import os
 import json

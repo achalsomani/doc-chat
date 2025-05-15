@@ -2,7 +2,6 @@
 *.log
 *.env
 .env.*
-vnerve/
-test_db.py
 node_modules/
 __pycache__/
+.vscode/

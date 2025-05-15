@@ -115,7 +115,6 @@ export default function ChatPage() {
               onClick={sendMessage}
               disabled={!input.trim() || sending}
             >
-              {sending ? "Sending..." : "Send"}
             </button>
           </div>
           {sending && (

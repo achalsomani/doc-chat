@@ -1,7 +1,10 @@
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 
-def retrieve_top_chunks(query_embedding: list[float], chunks: list[dict], top_k: int = 3) -> list[dict]:
+
+def retrieve_top_chunks(
+    query_embedding: list[float], chunks: list[dict], top_k: int = 3
+) -> list[dict]:
     embeddings = [item["embedding"] for item in chunks]
     query_vector = np.array(query_embedding).reshape(1, -1)
     stored_vectors = np.array(embeddings)

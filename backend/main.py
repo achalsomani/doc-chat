@@ -1,10 +1,16 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
 import uuid
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile
 from chunking import split_text_into_chunks
-from database import insert_chunk, fetch_all_chunks,update_chat, fetch_content, insert_new_chat,fetch_all_chats
+from database import (
+    insert_chunk,
+    fetch_all_chunks,
+    update_chat,
+    fetch_content,
+    insert_new_chat,
+    fetch_all_chats,
+)
 from embedd import generate_embedding
 from top_k import retrieve_top_chunks
 import os
@@ -24,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.post("/chat/new")
 async def create_chat() -> dict:
     try:
@@ -38,6 +45,7 @@ async def create_chat() -> dict:
 class MessageRequest(BaseModel):
     chat_id: str
     input: str
+
 
 @app.post("/message")
 async def handle_message(request: MessageRequest) -> dict:
@@ -56,24 +64,26 @@ async def handle_message(request: MessageRequest) -> dict:
 
         prompt = f"Context:\n{context}\n\nQuestion: {request.input}\nAnswer the question based on the context above. Please dont include any information that is not in the context. If you don't know the answer, say 'I don't know'. and dont include extra information."
         response = client.chat.completions.create(
-        model="gpt-4.1-mini",
-        messages=[{"role": "user", "content": prompt}]
+            model="gpt-4.1-mini", messages=[{"role": "user", "content": prompt}]
         )
         answer = response.choices[0].message.content
 
-        content.append({"message_id": str(uuid.uuid4()), "user": request.input, "agent": answer})
+        content.append(
+            {"message_id": str(uuid.uuid4()), "user": request.input, "agent": answer}
+        )
         update_chat(request.chat_id, content)
 
         return {
             "chat_id": request.chat_id,
             "response": answer,
-            "used_chunks": used_chunk_ids
+            "used_chunks": used_chunk_ids,
         }
     except HTTPException:
         raise
     except Exception as e:
         print(f"Message error: {e}")
         raise HTTPException(status_code=500, detail="Failed to process message.")
+
 
 @app.get("/history")
 async def get_full_history() -> dict:
@@ -83,6 +93,7 @@ async def get_full_history() -> dict:
     except Exception as e:
         print(f"History error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch history.")
+
 
 @app.get("/chat/{chat_id}")
 async def get_chat(chat_id: str) -> dict:
@@ -94,10 +105,11 @@ async def get_chat(chat_id: str) -> dict:
         print(f"Get chat error: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch chat.")
 
+
 @app.post("/ingest")
 async def ingest_file(file: UploadFile = File(...)) -> dict:
     try:
-        content = (await file.read()).decode('utf-8', errors='ignore')
+        content = (await file.read()).decode("utf-8", errors="ignore")
         chunks = split_text_into_chunks(content, max_tokens=300, overlap_tokens=50)
 
         for chunk in chunks:
@@ -109,6 +121,6 @@ async def ingest_file(file: UploadFile = File(...)) -> dict:
         print(f"Ingest error: {e}")
         raise HTTPException(status_code=500, detail="Failed to ingest file.")
 
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
-

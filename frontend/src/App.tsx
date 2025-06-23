@@ -7,7 +7,7 @@ export default function App() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
       <h1 className="text-4xl font-bold mb-12 text-center">
-        Take Home Assessment
+         Doc-chat
       </h1>
       <div className="flex gap-12">
         <button
